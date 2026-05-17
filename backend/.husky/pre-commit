@@ -1,0 +1,35 @@
+current_branch=(git rev-parse --abbrev-ref HEAD)
+
+# Protect branches.
+set -- main develop
+for protected_branch in "$@"
+do
+  if [ "$current_branch" = "$protected_branch" ]
+  then
+    printf "Cannot push to the protected branch \"%s\".\n" "$protected_branch"
+
+    exit 1
+  fi
+done
+
+# No ASCII in branch names.
+if [[ "$current_branch" = *[![:ascii:]]* ]]
+then
+  printf "Only ASCII characters are allowed in the branch name.\n"
+
+  exit 1
+fi
+
+# No uppercased letters in branch names.
+if [[ "$current_branch" =~ [[:upper:]] ]]
+then
+  printf "Uppercased letters are not allowed in the branch name.\n"
+
+  exit 1
+fi
+
+# Require linting.
+npm run lint
+npm run prettier
+
+exit 0

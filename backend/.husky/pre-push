@@ -1,0 +1,37 @@
+
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+while read -r local_ref _ remote_ref _
+do
+  # Allow pushing to HEAD.
+  # Usually done when undoing a push.
+  if [ "$local_ref" = "HEAD" ]
+  then
+    exit 0
+  fi
+
+  # Push to same remote only.
+  if [ "$local_ref" != "$remote_ref" ]
+  then
+    printf "Cannot push current branch to a different remote branch.\n"
+    printf "\"%s\" must be pushed to \"%s\".\n" "$local_ref" "$remote_ref"
+
+    exit 1
+  fi
+
+  # Protect branches.
+  set -- main develop
+  for protected_branch in "$@"
+  do
+    if [ "$current_branch" = "$protected_branch" ]
+    then
+      printf "Cannot push to the protected branch \"%s\".\n" "$protected_branch"
+
+      exit 1
+    fi
+  done
+
+  exit 0
+done
+
+exit 1

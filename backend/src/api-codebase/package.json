@@ -1,0 +1,17 @@
+{
+  "name": "api-codebase",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prebuild": "npx tsc",
+    "build": "node build.js",
+    "coverage": "npx jest"
+  },
+  "engines": {
+    "node": "^20"
+  },
+  "volta": {
+    "node": "20.18.2"
+  },
+  "devDependencies": {}
+}
