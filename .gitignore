@@ -5,7 +5,7 @@ coverage/
 DS_Store
 
 ## design
-out
+out/
 .puml
 .plantuml
 
