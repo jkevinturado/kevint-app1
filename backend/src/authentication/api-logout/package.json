@@ -1,0 +1,17 @@
+{
+  "name": "kevint-app1-api-logout",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prebuild": "npx tsc",
+    "build": "node ../../../build.js",
+    "coverage": "npx jest"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "volta": {
+    "node": "24.15.0"
+  },
+  "devDependencies": {}
+}
