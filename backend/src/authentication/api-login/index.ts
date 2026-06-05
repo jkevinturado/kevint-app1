@@ -1,31 +1,60 @@
-import { LoginEvent } from './types';
-import { InvalidAccessError } from './errors/auth';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
-import ApiLoginHandler from './handler';
+import { InvalidAccessError, BadRequestError } from './src/errors';
+import {
+  DynamodbItemNotFoundException,
+  SSMItemNotFoundException,
+} from './src/errors/aws';
 
-const responseHnadler = (statusCode: number, message: string) => {
+import ApiLoginHandler from './src/handler';
+
+const responseHandler = (
+  statusCode: number,
+  message: string,
+): APIGatewayProxyResult => {
   return {
     statusCode,
     body: JSON.stringify(message),
   };
 };
 
-export const handler = async (event: LoginEvent) => {
+export const handler = async (event: APIGatewayProxyEvent) => {
   console.info('Received Login Event: ', event);
 
   try {
     const { body } = event;
 
-    if (!body) {
-      console.warn('Missing request body');
-      return responseHnadler(400, 'Bad Request: Missing request body');
-    }
-
     const apiLoginHandler = new ApiLoginHandler(body);
-    const credentials = apiLoginHandler.validateCredentials();
+    await apiLoginHandler.execute();
+
+    console.info('Authentication successful');
+
+    return responseHandler(200, 'Login successful');
   } catch (error) {
     if (error instanceof InvalidAccessError) {
-      return responseHnadler(401, 'Unauthorized: Invalid email or password');
+      return responseHandler(
+        401,
+        InvalidAccessError.name + ': ' + error.message,
+      );
     }
+    if (error instanceof BadRequestError) {
+      return responseHandler(400, BadRequestError.name + ': ' + error.message);
+    }
+    if (error instanceof DynamodbItemNotFoundException) {
+      console.error('Error processing login request: ', error);
+      return responseHandler(
+        500,
+        DynamodbItemNotFoundException.name + ': ' + error.message,
+      );
+    }
+    if (error instanceof SSMItemNotFoundException) {
+      console.error('Error processing login request: ', error);
+      return responseHandler(
+        500,
+        SSMItemNotFoundException.name + ': ' + error.message,
+      );
+    }
+
+    return responseHandler(500, 'Internal Server Error');
   }
 };

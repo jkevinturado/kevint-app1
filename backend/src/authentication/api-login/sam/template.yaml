@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 29
+    MemorySize: 128
+  Api:
+    Cors:
+      AllowMethods: "'POST'"
+      AllowHeaders: "'Content-Type,Authorization'"
+      AllowOrigin: "'*'"
+
+Resources:
+  ApiAuthenticationLoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../dist/
+      Handler: index.handler
+      Runtime: nodejs24.x
+      Events:
+        LpsLogin:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: POST
+      Environment:
+        Variables:
+          AWS_REGION: ap-southeast-1
+          DYNAMODB_USER_DETAILS_TABLE:
+          DYNAMODB_USER_SESSION_TABLE:
+          DYNAMODB_USER_SESSION_TABLE_TTL_VALUE: 600
+          DYNAMODB_CONNECTION_TIMEOUT: 3000
+          DYNAMODB_REQUEST_TIMEOUT: 3000
+          DYNAMODB_MAX_ATTEMPTS: 3
+          SSM_PARAM_STORE_JWT_SECRET_DATA_API_PATH:
+          SSM_PARAM_STORE_CONNECTION_TIMEOUT: 3000
+          SSM_PARAM_STORE_REQUEST_TIMEOUT: 3000
+          SSM_PARAM_STORE_MAX_ATTEMPTS: 3
+          SSM_PARAM_STORE_MAX_AGE: 1000
