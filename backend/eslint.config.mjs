@@ -34,7 +34,7 @@ export default defineConfig([
 
   // ## Markdown files
   {
-    files: ['**/*.md'],
+    files: ['src/**/*.md'],
     language: 'markdown/gfm',
     ...markdown.configs.recommended,
   },
