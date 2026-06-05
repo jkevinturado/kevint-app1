@@ -1,17 +1,36 @@
 {
   "compilerOptions": {
-    "preserveConstEnums": true,
-    "noEmit": true,
-    "sourceMap": false,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "lib": ["es2022"],
-    "module": "es2022",
+    // What version of JavaScript to compile down to
     "target": "es2022",
+
+    // Use ES module syntax (import/export)
+    "module": "es2022",
+
+    // Use bundler-aware module resolution (works well with esbuild)
+    "moduleResolution": "bundler",
+
+    // Standard library — includes modern JS built-ins (Array, Promise, etc.)
+    "lib": ["es2022"],
+
+    // Enable all strict type checks — catches real bugs early
     "strict": true,
+
+    // Allow: import fs from 'fs'  instead of  import * as fs from 'fs'
     "esModuleInterop": true,
+
+    // Each file is compiled independently (required by esbuild)
+    "isolatedModules": true,
+
+    // Don't output .js files — esbuild handles the build
+    "noEmit": true,
+
+    // Skip type checking inside node_modules (much faster)
     "skipLibCheck": true,
-    "moduleResolution": "node",
+
+    // Prevent bugs caused by case-insensitive file systems
+    "forceConsistentCasingInFileNames": true,
+
+    // Include types for Node.js and Jest
     "types": ["node", "jest"]
   }
 }
