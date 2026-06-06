@@ -4,7 +4,7 @@ Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:
     Timeout: 29
-    MemorySize: 128
+    MemorySize: 256
   Api:
     Cors:
       AllowMethods: "'POST'"
@@ -26,13 +26,19 @@ Resources:
             Method: POST
       Environment:
         Variables:
-          AWS_REGION: ap-southeast-1
+          ENVIRONMENT: aws
+          LOCALSTACK_ENDPOINT:
+          LOCALSTACK_REGION:
+          LOCALSTACK_ACCESS_KEY:
+          LOCALSTACK_SECRET_KEY:
+          DYNAMODB_REGION: ap-southeast-1
           DYNAMODB_USER_DETAILS_TABLE:
           DYNAMODB_USER_SESSION_TABLE:
           DYNAMODB_USER_SESSION_TABLE_TTL_VALUE: 600
           DYNAMODB_CONNECTION_TIMEOUT: 3000
           DYNAMODB_REQUEST_TIMEOUT: 3000
           DYNAMODB_MAX_ATTEMPTS: 3
+          SSM_PARAM_STORE_REGION: ap-southeast-1
           SSM_PARAM_STORE_JWT_SECRET_DATA_API_PATH:
           SSM_PARAM_STORE_CONNECTION_TIMEOUT: 3000
           SSM_PARAM_STORE_REQUEST_TIMEOUT: 3000

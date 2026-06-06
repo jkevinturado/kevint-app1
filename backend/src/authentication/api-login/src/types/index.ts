@@ -7,7 +7,7 @@ interface PartialApiGatewayEvent {
 
 export type LoginEvent = APIGatewayProxyEvent | PartialApiGatewayEvent;
 
-export interface body {
+export interface LoginRequestBody {
   email: string;
   password: string;
 }
@@ -15,5 +15,5 @@ export interface body {
 export interface UserDetails {
   userId: string;
   email: string;
-  passwordHash: string;
+  password: string;
 }

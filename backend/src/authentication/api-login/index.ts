@@ -1,4 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { SSMServiceException } from '@aws-sdk/client-ssm';
+import { DynamoDBServiceException } from '@aws-sdk/client-dynamodb';
 
 import { InvalidAccessError, BadRequestError } from './src/errors';
 import {
@@ -34,27 +36,35 @@ export const handler = async (event: APIGatewayProxyEvent) => {
     if (error instanceof InvalidAccessError) {
       return responseHandler(
         401,
-        InvalidAccessError.name + ': ' + error.message,
+        error.constructor.name + ': ' + error.message,
       );
     }
     if (error instanceof BadRequestError) {
-      return responseHandler(400, BadRequestError.name + ': ' + error.message);
-    }
-    if (error instanceof DynamodbItemNotFoundException) {
-      console.error('Error processing login request: ', error);
       return responseHandler(
-        500,
-        DynamodbItemNotFoundException.name + ': ' + error.message,
+        400,
+        error.constructor.name + ': ' + error.message,
       );
     }
-    if (error instanceof SSMItemNotFoundException) {
+    if (error instanceof DynamodbItemNotFoundException) {
+      console.warn('Authentication failed: ', error);
+      return responseHandler(
+        401,
+        error.constructor.name + ': ' + error.message,
+      );
+    }
+    if (
+      error instanceof SSMItemNotFoundException ||
+      error instanceof SSMServiceException ||
+      error instanceof DynamoDBServiceException
+    ) {
       console.error('Error processing login request: ', error);
       return responseHandler(
         500,
-        SSMItemNotFoundException.name + ': ' + error.message,
+        error.constructor.name + ': ' + error.message,
       );
     }
 
+    console.error(error);
     return responseHandler(500, 'Internal Server Error');
   }
 };

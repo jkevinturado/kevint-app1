@@ -1,5 +1,5 @@
-import { compare } from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
+import bcryptjs from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
 
 import { LoginEvent } from '../types';
 
@@ -22,19 +22,25 @@ export default class ApiLoginHandler {
   }
 
   private validateCredentials() {
+    console.info('Validating login credentials');
     if (!this.body) {
       console.warn('Missing request body');
       throw new BadRequestError('Missing request body');
     }
 
-    const parsedBody = this.body ? JSON.parse(this.body) : null;
-    if (!parsedBody) {
-      console.warn('Invalid email or password');
-      throw new InvalidAccessError('Invalid email or password');
-    }
+    try {
+      const parsedBody = this.body ? JSON.parse(this.body) : null;
+      if (!parsedBody) {
+        console.warn('Invalid email or password');
+        throw new InvalidAccessError('Invalid email or password');
+      }
 
-    this.email = parsedBody.email;
-    this.password = parsedBody.password;
+      this.email = parsedBody.email;
+      this.password = parsedBody.password;
+    } catch {
+      console.warn('Invalid request body format');
+      throw new BadRequestError('Invalid request body format');
+    }
 
     if (!this.email || !this.password) {
       console.warn('Email and password are required');
@@ -43,11 +49,13 @@ export default class ApiLoginHandler {
   }
 
   private async authenticateUser() {
+    console.info('Authenticating user');
+
     const userDetails = await getUserDetails(this.email);
 
-    const passwordMatch = await compare(
+    const passwordMatch = await bcryptjs.compare(
       this.password,
-      userDetails.passwordHash,
+      userDetails.password,
     );
     if (!passwordMatch) {
       console.warn('Authentication failed, Invalid password.');
@@ -58,13 +66,14 @@ export default class ApiLoginHandler {
   }
 
   private async generateToken() {
+    console.info('Generating JWT token');
     const jwtSecretData = await getJwtSecretDataParamPath();
     if (!jwtSecretData) {
       console.warn('Failed to retrieve JWT secret data.');
       throw new Error('Failed to retrieve JWT secret data.');
     }
 
-    const token = sign({ userId: this.userId }, jwtSecretData, {
+    const token = jwt.sign({ userId: this.userId }, jwtSecretData, {
       expiresIn: '1h',
     });
     await putUserSession(this.userId, token);
