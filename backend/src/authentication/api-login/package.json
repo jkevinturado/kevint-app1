@@ -1,0 +1,36 @@
+{
+  "name": "kevint-app1-api-authentication-login",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prebuild": "npx shx rm -rf dist && npx tsc",
+    "build": "node ../../../build.js",
+    "coverage": "npx jest",
+    "prepackage": "npm run build",
+    "package": "cd dist && 7z a package.zip .",
+    "presam:local-api": "npm run build",
+    "presam:invoke": "npm run build",
+    "sam:local-api": "sam local start-api --skip-pull-image --template ./sam/template.yaml -p 8000",
+    "sam:invoke": "sam local invoke ApiAuthenticationLoginFunction --event ./sam/event.json --template ./sam/template.yaml"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1060.0",
+    "@aws-sdk/client-ssm": "^3.1060.0",
+    "@aws-sdk/util-dynamodb": "^3.996.2",
+    "@smithy/node-http-handler": "^4.7.6",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "luxon": "^3.7.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/luxon": "^3.7.1"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "volta": {
+    "node": "24.15.0"
+  }
+}
